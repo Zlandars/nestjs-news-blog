@@ -1,5 +1,4 @@
 import { News } from '../../news/news.service';
-import { Comment } from '../../news/comments/comments.service';
 
 export function NewsPage(news: News, comments: string) {
   return `<div class="row">
@@ -13,8 +12,9 @@ export function NewsPage(news: News, comments: string) {
 </div>
 <div class="col-sm">
   ${comments}
-  <form action="/comments/api/" method="post">
+  <form action="/comments/api/" id="comments" method="post">
   <input style="display:none;" name="idNews" value="${news.id}" readonly>
+  <input style="display:none;" name="idAnswer" value="">
   <input name="author" placeholder="Author">
   <input name="message" type="text" placeholder="Message">
   <button>Отправить сообщение</button>

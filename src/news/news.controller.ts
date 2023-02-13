@@ -38,8 +38,11 @@ export class NewsController {
   getNewsView(@Param('id') idOrig: string): string {
     const id = parseInt(idOrig);
     const news = this.newsService.find(id);
-    const comments = this.commentService.find(id) || [];
+    // Чтобы функция не влияла на комменты
+    const comments = [...this.commentService.find(id)] || [];
     const readyComments = CommentListView(comments);
+    // Счетчик просмотров
+    ++news.countView;
     const readyNews = NewsPage(news, readyComments);
     return renderTemplate(readyNews, {
       title: `Новость #${id}`,

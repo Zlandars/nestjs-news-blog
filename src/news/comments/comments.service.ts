@@ -6,7 +6,7 @@ export type Comment = {
   message: string;
   author: string;
   idNews: number;
-  answer?: Comment[];
+  idAnswer: number;
 };
 
 export type EditComment = {
@@ -14,16 +14,29 @@ export type EditComment = {
   message: string;
   author: string;
   idNews: number;
-  answer?: Comment[];
+  idAnswer: number;
 };
 
 @Injectable()
 export class CommentsService {
   private readonly comments = {
     '1': [
-      { idNews: '1', author: 'qwe', message: '123', id: 1 },
-      { idNews: '1', author: 'qwe', message: '123', id: 2 },
-      { idNews: '1', author: 'qwe', message: '123', id: 3, idAnswer: 1 },
+      { idNews: '1', author: 'First', message: 'First message 123', id: 1 },
+      { idNews: '1', author: 'Second', message: 'Second message 123', id: 2 },
+      {
+        idNews: '1',
+        author: 'first Answer',
+        message: 'first Answer messsge123',
+        id: 3,
+        idAnswer: 1,
+      },
+      {
+        idNews: '1',
+        author: 'Secong answEugen',
+        message: 'Second answer message',
+        id: 4,
+        idAnswer: 1,
+      },
     ],
   };
 
@@ -38,7 +51,6 @@ export class CommentsService {
       ...comment,
       id: getRandomInt(),
     });
-    console.log(this.comments);
     return this.comments[idNews];
   }
 

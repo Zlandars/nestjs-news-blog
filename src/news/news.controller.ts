@@ -5,8 +5,8 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
-  Put,
 } from '@nestjs/common';
 import { News, NewsService } from './news.service';
 import { CommentsService } from './comments/comments.service';
@@ -14,6 +14,7 @@ import { renderNewsAll } from '../views/news/news-all';
 import { renderTemplate } from '../views/template';
 import { NewsPage } from '../views/news/news';
 import { CommentListView } from '../views/news/comments/coments';
+import { CreateNewsDto } from './dto/create.news.dto';
 
 @Controller('news')
 export class NewsController {
@@ -68,14 +69,14 @@ export class NewsController {
     };
   }
 
-  @Put('/api')
+  @Patch('/api')
   edit(@Body() news: News): News[] {
     return this.newsService.edit(news);
   }
 
   @Post('/api')
   @HttpCode(200)
-  create(@Body() news: News): News[] {
+  create(@Body() news: CreateNewsDto): News[] {
     return this.newsService.create(news);
   }
 

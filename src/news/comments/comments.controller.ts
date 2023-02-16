@@ -4,10 +4,9 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Redirect,
   Req,
-  Request,
   Res,
 } from '@nestjs/common';
 import { Comment, CommentsService, EditComment } from './comments.service';
@@ -16,7 +15,7 @@ import { Comment, CommentsService, EditComment } from './comments.service';
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
-  @Post('/api/:idNewsParam/:idCommentParam')
+  @Patch('/api/:idNewsParam/:idCommentParam')
   edit(
     @Param('idNewsParam') idNewsParam: string,
     @Param('idCommentParam') idCommentParam: string,

@@ -1,17 +1,20 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 export class EditCommentDto {
   @IsNumber()
   id: number;
   @IsString()
-  message?: string;
+  // @ValidateIf((o) => o.message)
+  message: string;
   @IsString()
-  author?: string;
+  // @ValidateIf((o) => o.author)
+  author: string;
   @IsNumber()
-  idNews?: number;
-  @IsNumber()
-  idAnswer?: number;
   @IsOptional()
+  // @ValidateIf((o) => o.idAnswer)
+  idAnswer: number;
   @IsString()
+  @IsOptional()
+  // @ValidateIf((o) => o.logo)
   logo?: string;
 }

@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Render,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -31,14 +32,13 @@ export class NewsController {
   ) {}
 
   @Get('/')
+  @Render('/')
   @HttpCode(200)
   allNewsView() {
     const news = this.newsService.allNews();
-    const content = renderNewsAll(news);
-    return renderTemplate(content, {
-      title: 'Список новостей',
-      description: 'новости',
-    });
+    console.log(news);
+    // const content = renderNewsAll(news);
+    return news;
   }
 
   @Get('/:id')

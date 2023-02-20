@@ -23,14 +23,38 @@ export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
   @Patch('/api/:idNewsParam/:idCommentParam')
+  @UseInterceptors(
+    FileInterceptor('logo', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+      fileFilter: (req: Request, file, cb) => {
+        const originalName = file.originalname.split('.');
+        const fileExtension = originalName[originalName.length - 1];
+        const arr = ['png', 'jpeg', 'jpg', 'gif'];
+        if (arr.indexOf(fileExtension) != -1) {
+          return cb(null, true);
+        }
+        return cb(new Error('Extension not allowed'), false);
+      },
+    }),
+  )
   edit(
     @Param('idNewsParam') idNewsParam: string,
     @Param('idCommentParam') idCommentParam: string,
+    @UploadedFile() logo: Express.Multer.File,
+    @Req() headers,
+    @Res() res,
     @Body() comment: EditCommentDto,
   ) {
     const idNews = parseInt(idNewsParam);
     const idComment = parseInt(idCommentParam);
-    return this.commentService.edit(idNews, idComment, comment);
+    if (logo?.filename) {
+      comment.logo = '/' + logo.filename;
+    }
+    this.commentService.edit(idNews, idComment, comment);
+    return res.redirect(`${headers.headers.referer}`);
   }
 
   @Post('/api')

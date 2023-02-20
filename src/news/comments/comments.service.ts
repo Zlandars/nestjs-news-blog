@@ -5,6 +5,7 @@ export type Comment = {
   id?: number;
   message: string;
   author: string;
+  logo?: string;
   idNews: number;
   idAnswer?: number;
 };
@@ -39,6 +40,9 @@ export class CommentsService {
   create(idNews: number, comment: Comment) {
     if (idNews === undefined && comment.idNews) {
       idNews = comment.idNews;
+    }
+    if (comment.id) {
+      return this.edit(idNews, comment.id, comment);
     }
     if (this.comments[idNews] === undefined) {
       this.comments[idNews] = [];

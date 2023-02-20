@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Comment } from './comments/comments.service';
 import { getRandomInt } from '../utils/utils';
+import { DeleteNewsDto } from './dto/delete.news.dto';
 
 export type News = {
   id?: number;

@@ -7,6 +7,8 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { News, NewsService } from './news.service';
 import { CommentsService } from './comments/comments.service';
@@ -15,6 +17,11 @@ import { renderTemplate } from '../views/template';
 import { NewsPage } from '../views/news/news';
 import { CommentListView } from '../views/news/comments/coments';
 import { CreateNewsDto } from './dto/create.news.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { HelperFileLoader } from '../utils/HelperFileLoad';
+import { diskStorage } from 'multer';
+import { EditNewsDto } from './dto/edit.news.dto';
+import { DeleteNewsDto } from './dto/delete.news.dto';
 
 @Controller('news')
 export class NewsController {
@@ -70,21 +77,35 @@ export class NewsController {
   }
 
   @Patch('/api')
-  edit(@Body() news: News): News[] {
+  edit(@Body() news: EditNewsDto): News[] {
     return this.newsService.edit(news);
   }
 
   @Post('/api')
+  @UseInterceptors(
+    FileInterceptor('cover', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+    }),
+  )
   @HttpCode(200)
-  create(@Body() news: CreateNewsDto): News[] {
+  create(
+    @Body() news: CreateNewsDto,
+    @UploadedFile() cover: Express.Multer.File,
+  ): News[] {
+    if (cover?.filename) {
+      news.cover = '/' + cover.filename;
+    }
     return this.newsService.create(news);
   }
 
   @Delete('/api/:id')
   @HttpCode(200)
-  delete(@Param('id') idOrig: string): string {
-    const id = parseInt(idOrig);
-    const isRemoved = this.newsService.remove(id);
+  delete(@Param('id') idOrig: DeleteNewsDto): string {
+    // @ts-ignore
+    const isRemoved = this.newsService.remove(parseInt(idOrig));
     return isRemoved ? 'Новость удалена' : 'Передан неверный id';
   }
 }

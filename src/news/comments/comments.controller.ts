@@ -8,8 +8,15 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Comment, CommentsService, EditComment } from './comments.service';
+import { EditCommentDto } from './dto/edit.comment.dto';
+import { CreateCommentDto } from './dto/create.comment.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { HelperFileLoader } from '../../utils/HelperFileLoad';
 
 @Controller('comments')
 export class CommentsController {
@@ -19,7 +26,7 @@ export class CommentsController {
   edit(
     @Param('idNewsParam') idNewsParam: string,
     @Param('idCommentParam') idCommentParam: string,
-    @Body() comment: EditComment,
+    @Body() comment: EditCommentDto,
   ) {
     const idNews = parseInt(idNewsParam);
     const idComment = parseInt(idCommentParam);
@@ -27,12 +34,24 @@ export class CommentsController {
   }
 
   @Post('/api')
+  @UseInterceptors(
+    FileInterceptor('logo', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+    }),
+  )
   create(
     @Body('idNews') idNewsParam: string,
-    @Body() comment: Comment,
+    @Body() comment: CreateCommentDto,
+    @UploadedFile() logo: Express.Multer.File,
     @Req() headers,
     @Res() res,
   ) {
+    if (logo?.filename) {
+      comment.logo = '/' + logo.filename;
+    }
     const idNews = parseInt(idNewsParam);
     this.commentService.create(idNews, comment);
     return res.redirect(`${headers.headers.referer}`);

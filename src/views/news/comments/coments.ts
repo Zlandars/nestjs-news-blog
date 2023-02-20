@@ -3,6 +3,11 @@ import { Comment } from '../../../news/comments/comments.service';
 function renderCommentsBlock(comment: Comment) {
   return `
   <li id="${comment.id}">
+  ${
+    comment.logo
+      ? `<img src="${comment.logo}" style="border-radius: 25%; height: 100px">`
+      : ''
+  }
   Author: ${comment.author}
   <br>
   Message: ${comment.message}
@@ -10,9 +15,8 @@ function renderCommentsBlock(comment: Comment) {
   <button id="${comment.id}" onclick="replyComment(event)">Reply</button>
   <script>
   function replyComment(e) {
-                       const form = document.querySelector("#comments");
-                       form.idAnswer.value = e.target.id;
-      console.log(form.idAnswer )
+       const form = document.querySelector("#comments");
+       form.idAnswer.value = e.target.id;
   }
 </script>
 </li>

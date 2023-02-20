@@ -5,9 +5,17 @@ import { NewsModule } from './news/news.module';
 import { CalculatorController } from './calculator/calculator.controller';
 import { CalculatorService } from './calculator/calculator.service';
 import { CalculatorModule } from './calculator/calculator.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [NewsModule, CalculatorModule],
+  imports: [
+    NewsModule,
+    CalculatorModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+  ],
   controllers: [AppController, CalculatorController],
   providers: [AppService, CalculatorService],
 })

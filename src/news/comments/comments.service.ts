@@ -1,37 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { getRandomInt } from '../news.service';
+import { getRandomInt } from '../../utils/utils';
 
 export type Comment = {
   id?: number;
   message: string;
   author: string;
+  logo?: string;
   idNews: number;
-  idAnswer: number;
+  idAnswer?: number;
 };
 
-export type EditComment = {
-  id: number;
-  message: string;
-  author: string;
-  idNews: number;
-  idAnswer: number;
-};
+export type EditComment = Partial<Comment>;
+
+export type Comments = Record<string, Comment[]>;
 
 @Injectable()
 export class CommentsService {
-  private readonly comments = {
+  private readonly comments: Comments = {
     '1': [
-      { idNews: '1', author: 'First', message: 'First message 123', id: 1 },
-      { idNews: '1', author: 'Second', message: 'Second message 123', id: 2 },
+      { idNews: 1, author: 'First', message: 'First message 123', id: 1 },
+      { idNews: 1, author: 'Second', message: 'Second message 123', id: 2 },
       {
-        idNews: '1',
+        idNews: 1,
         author: 'first Answer',
         message: 'first Answer messsge123',
         id: 3,
         idAnswer: 1,
       },
       {
-        idNews: '1',
+        idNews: 1,
         author: 'Secong answEugen',
         message: 'Second answer message',
         id: 4,
@@ -43,6 +40,9 @@ export class CommentsService {
   create(idNews: number, comment: Comment) {
     if (idNews === undefined && comment.idNews) {
       idNews = comment.idNews;
+    }
+    if (comment.id) {
+      return this.edit(idNews, comment.id, comment);
     }
     if (this.comments[idNews] === undefined) {
       this.comments[idNews] = [];

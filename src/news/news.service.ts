@@ -1,29 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Comment } from './comments/comments.service';
+import { getRandomInt } from '../utils/utils';
+import { DeleteNewsDto } from './dto/delete.news.dto';
 
-export interface News {
-  id: number;
+export type News = {
+  id?: number;
   title: string;
   description: string;
   author: string;
   countView: number;
   comments?: Comment[];
   cover?: string;
-}
+};
 
-export interface NewsEdit {
-  title?: string;
-  description?: string;
-  author?: string;
-  countView?: number;
-  cover?: string;
-}
-
-export function getRandomInt(min = 1, max = 99999): number {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-}
+export type NewsEdit = Partial<News>;
 
 @Injectable()
 export class NewsService {
@@ -41,14 +31,14 @@ export class NewsService {
   ];
 
   create(news: News): News[] {
-    if (this.find(news.id) == undefined) {
-      this.news.push({
-        ...news,
-        id: getRandomInt(),
-      });
-      return this.news;
-    }
-    return this.edit(news);
+    // if (this.find(news.id) == undefined) {
+    this.news.push({
+      ...news,
+      id: getRandomInt(),
+    });
+    return this.news;
+    // }
+    // return this.edit(news);
   }
 
   find(id: number) {
@@ -64,10 +54,11 @@ export class NewsService {
     return false;
   }
 
-  edit(news: News): News[] {
+  edit(news: NewsEdit): News[] {
     const indexRemove = this.news.findIndex((item) => item.id === news.id);
     if (indexRemove !== -1) {
       this.news[indexRemove] = {
+        ...this.news[indexRemove],
         ...news,
       };
     }

@@ -12,11 +12,12 @@ export function NewsPage(news: News, comments: string) {
 </div>
 <div class="col-sm">
   ${comments}
-  <form action="/comments/api/" id="comments" method="post">
+  <form action="/comments/api/" id="comments" method="post" enctype="multipart/form-data">
   <input style="display:none;" name="idNews" value="${news.id}" readonly>
   <input style="display:none;" name="idAnswer" value="">
   <input name="author" placeholder="Author">
   <input name="message" type="text" placeholder="Message">
+  <input type="file" name="logo">
   <button>Отправить сообщение</button>
 </form>
 </div>

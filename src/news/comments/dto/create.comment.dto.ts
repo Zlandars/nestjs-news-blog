@@ -1,14 +1,14 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateCommentDto {
   @IsString()
   message: string;
   @IsString()
   author: string;
-  @IsNumber()
+  @IsString()
   idNews: number;
   @IsOptional()
-  @IsNumber()
+  @IsString()
   idAnswer?: number;
   @IsOptional()
   @IsString()

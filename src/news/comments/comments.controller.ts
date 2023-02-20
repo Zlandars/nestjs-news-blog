@@ -11,7 +11,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { Comment, CommentsService, EditComment } from './comments.service';
+import { Comment, CommentsService } from './comments.service';
 import { EditCommentDto } from './dto/edit.comment.dto';
 import { CreateCommentDto } from './dto/create.comment.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -40,6 +40,15 @@ export class CommentsController {
         destination: HelperFileLoader.destinationPath,
         filename: HelperFileLoader.customFileName,
       }),
+      fileFilter: (req: Request, file, cb) => {
+        const originalName = file.originalname.split('.');
+        const fileExtension = originalName[originalName.length - 1];
+        const arr = ['png', 'jpeg', 'jpg', 'gif'];
+        if (arr.indexOf(fileExtension) != -1) {
+          return cb(null, true);
+        }
+        return cb(new Error('Extension not allowed'), false);
+      },
     }),
   )
   create(

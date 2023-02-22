@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Comment } from './comments/comments.service';
 import { getRandomInt } from '../utils/utils';
-import { DeleteNewsDto } from './dto/delete.news.dto';
 
 export type News = {
   id?: number;
@@ -30,13 +29,15 @@ export class NewsService {
     },
   ];
 
-  create(news: News): News[] {
+  create(news: News): News {
     // if (this.find(news.id) == undefined) {
+    const id = getRandomInt();
     this.news.push({
       ...news,
-      id: getRandomInt(),
+      id: id,
     });
-    return this.news;
+    news.id = id;
+    return news;
     // }
     // return this.edit(news);
   }

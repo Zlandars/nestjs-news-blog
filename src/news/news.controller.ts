@@ -8,12 +8,12 @@ import {
   Patch,
   Post,
   Render,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { News, NewsService } from './news.service';
 import { CommentsService } from './comments/comments.service';
-import { renderNewsAll } from '../views/news/news-all';
 import { renderTemplate } from '../views/template';
 import { NewsPage } from '../views/news/news';
 import { CommentListView } from '../views/news/comments/coments';
@@ -22,23 +22,21 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { HelperFileLoader } from '../utils/HelperFileLoad';
 import { diskStorage } from 'multer';
 import { EditNewsDto } from './dto/edit.news.dto';
-import { DeleteNewsDto } from './dto/delete.news.dto';
+import { MailService } from '../mail/mail.service';
 
 @Controller('news')
 export class NewsController {
   constructor(
     private readonly newsService: NewsService,
     private readonly commentService: CommentsService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get('/')
-  @Render('/')
+  @Render('news-list')
   @HttpCode(200)
   allNewsView() {
-    const news = this.newsService.allNews();
-    console.log(news);
-    // const content = renderNewsAll(news);
-    return news;
+    return { news: this.newsService.allNews(), title: 'Список новостей' };
   }
 
   @Get('/:id')
@@ -58,9 +56,16 @@ export class NewsController {
     });
   }
 
+  @Get('/create/view')
+  @Render('create-news')
+  @HttpCode(200)
+  createView() {
+    return {};
+  }
+
   @Get('/api/all')
   @HttpCode(200)
-  allNews(): News[] {
+  createNewsView(): News[] {
     return this.newsService.allNews();
   }
 
@@ -77,11 +82,6 @@ export class NewsController {
   }
 
   @Patch('/api')
-  edit(@Body() news: EditNewsDto): News[] {
-    return this.newsService.edit(news);
-  }
-
-  @Post('/api')
   @UseInterceptors(
     FileInterceptor('cover', {
       storage: diskStorage({
@@ -91,20 +91,46 @@ export class NewsController {
     }),
   )
   @HttpCode(200)
-  create(
-    @Body() news: CreateNewsDto,
+  edit(
+    @Body() news: EditNewsDto,
     @UploadedFile() cover: Express.Multer.File,
   ): News[] {
+    console.log('isRunning');
     if (cover?.filename) {
       news.cover = '/' + cover.filename;
     }
-    return this.newsService.create(news);
+    return this.newsService.edit(news);
+  }
+
+  @Post('/api/create')
+  @UseInterceptors(
+    FileInterceptor('cover', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+    }),
+  )
+  @HttpCode(200)
+  async create(
+    @Body() news: CreateNewsDto,
+    @UploadedFile() cover: Express.Multer.File,
+    @Res() response,
+  ): Promise<News> {
+    if (cover?.filename) {
+      news.cover = '/' + cover.filename;
+    }
+    const createdNews = this.newsService.create(news);
+    await this.mailService.sendNewNewsForAdmins(
+      ['mag20102009@gmail.com'],
+      createdNews,
+    );
+    return response.redirect(`/news`);
   }
 
   @Delete('/api/:id')
   @HttpCode(200)
-  delete(@Param('id') idOrig: DeleteNewsDto): string {
-    // @ts-ignore
+  delete(@Param('id') idOrig: string): string {
     const isRemoved = this.newsService.remove(parseInt(idOrig));
     return isRemoved ? 'Новость удалена' : 'Передан неверный id';
   }

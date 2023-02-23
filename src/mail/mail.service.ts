@@ -41,4 +41,27 @@ export class MailService {
         });
     }
   }
+
+  async editedNewsForAdmin(emails: string[], news: News, difference) {
+    console.log({ news, difference });
+    for (const email of emails) {
+      await this.mailerService
+        .sendMail({
+          to: email,
+          subject: `${
+            difference.title
+              ? `Была новость: ${news.title} > ${difference.title} `
+              : `Отредактирована новая новость: ${news.title}`
+          }`,
+          template: './edited-news',
+          context: { news: news, diff: difference },
+        })
+        .then((res) => {
+          console.log('res', res);
+        })
+        .catch((err) => {
+          console.log('err', err);
+        });
+    }
+  }
 }

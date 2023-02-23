@@ -14,15 +14,21 @@ import {
 } from '@nestjs/common';
 import { News, NewsService } from './news.service';
 import { CommentsService } from './comments/comments.service';
-import { renderTemplate } from '../views/template';
-import { NewsPage } from '../views/news/news';
-import { CommentListView } from '../views/news/comments/coments';
 import { CreateNewsDto } from './dto/create.news.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HelperFileLoader } from '../utils/HelperFileLoad';
 import { diskStorage } from 'multer';
-import { EditNewsDto } from './dto/edit.news.dto';
 import { MailService } from '../mail/mail.service';
+
+function difference(newNews: News, oldNews: News) {
+  const result = {};
+  Object.keys(oldNews).map((key) => {
+    if (oldNews[key] != newNews[key]) {
+      result[key] = newNews[key];
+    }
+  });
+  return result;
+}
 
 @Controller('news')
 export class NewsController {
@@ -40,20 +46,21 @@ export class NewsController {
   }
 
   @Get('/:id')
+  @Render('news')
   @HttpCode(200)
-  getNewsView(@Param('id') idOrig: string): string {
+  getNewsView(@Param('id') idOrig: string): any {
     const id = parseInt(idOrig);
     const news = this.newsService.find(id);
     // Чтобы функция не влияла на комменты
     const comments = [...this.commentService.find(id)] || [];
-    const readyComments = CommentListView(comments);
+    // const readyComments = CommentListView(comments);
     // Счетчик просмотров
     ++news.countView;
-    const readyNews = NewsPage(news, readyComments);
-    return renderTemplate(readyNews, {
-      title: `Новость #${id}`,
-      description: 'новости',
-    });
+    // const readyNews = NewsPage(news, readyComments);
+    return {
+      news: news,
+      comments: comments,
+    };
   }
 
   @Get('/create/view')
@@ -61,6 +68,16 @@ export class NewsController {
   @HttpCode(200)
   createView() {
     return {};
+  }
+
+  @Get('/:id/edit')
+  @Render('news-edit')
+  @HttpCode(200)
+  editNewsView(@Param('id') id: string) {
+    return {
+      news: this.newsService.find(parseInt(id)),
+      title: `Новость ${id}`,
+    };
   }
 
   @Get('/api/all')
@@ -81,7 +98,7 @@ export class NewsController {
     };
   }
 
-  @Patch('/api')
+  @Post('/api/edit')
   @UseInterceptors(
     FileInterceptor('cover', {
       storage: diskStorage({
@@ -91,15 +108,23 @@ export class NewsController {
     }),
   )
   @HttpCode(200)
-  edit(
-    @Body() news: EditNewsDto,
+  async edit(
+    @Body() news: any,
     @UploadedFile() cover: Express.Multer.File,
-  ): News[] {
-    console.log('isRunning');
+    @Res() response,
+  ): Promise<News[]> {
+    const oldNews = this.newsService.find(news.id);
     if (cover?.filename) {
       news.cover = '/' + cover.filename;
     }
-    return this.newsService.edit(news);
+    const editedNews = this.newsService.edit(news);
+    const diff = difference(editedNews, oldNews);
+    await this.mailService.editedNewsForAdmin(
+      ['mag20102009@gmail.com'],
+      oldNews,
+      diff,
+    );
+    return response.redirect(`/news/${editedNews.id}`);
   }
 
   @Post('/api/create')
@@ -120,6 +145,7 @@ export class NewsController {
     if (cover?.filename) {
       news.cover = '/' + cover.filename;
     }
+    this.newsService.create(news);
     const createdNews = this.newsService.create(news);
     await this.mailService.sendNewNewsForAdmins(
       ['mag20102009@gmail.com'],

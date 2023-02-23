@@ -30,12 +30,16 @@ export class NewsService {
   ];
 
   create(news: News): News {
+    console.log(news);
     // if (this.find(news.id) == undefined) {
     const id = getRandomInt();
     this.news.push({
       ...news,
       id: id,
+      countView: 1,
+      comments: [],
     });
+    console.log(this.news);
     news.id = id;
     return news;
     // }
@@ -43,7 +47,7 @@ export class NewsService {
   }
 
   find(id: number) {
-    return this.news.find((item) => item.id === id);
+    return this.news.find((item) => item.id == id);
   }
 
   remove(id: number) {
@@ -55,15 +59,15 @@ export class NewsService {
     return false;
   }
 
-  edit(news: NewsEdit): News[] {
-    const indexRemove = this.news.findIndex((item) => item.id === news.id);
+  edit(news: NewsEdit): News {
+    const indexRemove = this.news.findIndex((item) => item.id == news.id);
     if (indexRemove !== -1) {
       this.news[indexRemove] = {
         ...this.news[indexRemove],
         ...news,
       };
     }
-    return this.news;
+    return this.news[indexRemove];
   }
 
   allNews(): News[] {

@@ -38,6 +38,7 @@ export class CommentsService {
   };
 
   create(idNews: number, comment: Comment) {
+    console.log('service');
     if (idNews === undefined && comment.idNews) {
       idNews = comment.idNews;
     }
@@ -55,7 +56,10 @@ export class CommentsService {
   }
 
   find(idNews: number): Comment[] {
-    return this.comments[idNews] || undefined;
+    if (!this.comments[idNews]) {
+      this.comments[idNews] = [];
+    }
+    return this.comments[idNews];
   }
 
   remove(idNews: number, idComment: number): Comment[] | null {

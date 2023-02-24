@@ -1,0 +1,72 @@
+{{#if news}}
+    <div class='row'>
+        <h3><a href='/news/{{news.id}}/edit'>Редактировать</a></h3>
+        <div
+                class='col-sm'
+                style='text-align: center; background-color: #ffe; display: flex; flex-direction: column'
+        >
+            <h3><a href='/news' class='card-link'>{{news.title}}</a></h3>
+            <img src='{{news.cover}}' alt=''/>
+            <span>Описание: {{news.description}}</span>
+            <span>Просмотров: {{news.countView}}</span>
+            <span>Автор: {{news.author}}</span>
+            <a href='/news' class='card-link'>Card link</a>
+        </div>
+        <div class='col-sm'>
+            {{#if comments}}
+                {{#each comments}}
+                    <li id='{{this.id}}'>
+                        {{#if this.logo}}
+                            <img
+                                    src='{{this.logo}}'
+                                    style='border-radius: 25%; height: 100px'
+                                    alt="Место для Вашего лого"
+                            />
+                        {{/if}}
+                        Author:
+                        {{this.author}}
+                        <br/>
+                        Message:
+                        {{#if this.idAnswer}}
+                            <a href='#{{this.idAnswer}}'>{{this.idAnswer}}</a>{{/if}}
+                        {{this.message}}
+                        <br/>
+                        <button
+                                id='{{this.id}}'
+                                onclick='replyComment(event)'
+                        >Reply
+                        </button>
+                    </li>
+                {{/each}}
+            {{/if}}
+            <form
+                    action='/comments/api/'
+                    id='comments'
+                    method='post'
+                    enctype='multipart/form-data'
+            >
+                <input
+                        style='display:none;'
+                        name='idNews'
+                        value='{{news.id}}'
+                        readonly
+                />
+                <input style='display:none;' name='idAnswer' value=''/>
+                <input name='author' placeholder='Author' required/>
+                <input name='message' type='text' placeholder='Message' required/>
+                <input type='file' name='logo'/>
+                <button>Отправить сообщение</button>
+            </form>
+            <script>
+                function replyComment(e) {
+                    const form =
+                            document.querySelector("#comments");
+                    form.idAnswer.value = e.target.id;
+                    console.log('id заменен на ' + form.idAnswer.value)
+                }
+            </script>
+        </div>
+    </div>
+{{else}}
+    <h1>Новость недоступна!</h1>
+{{/if}}

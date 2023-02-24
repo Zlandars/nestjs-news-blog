@@ -1,5 +1,4 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
-import { Comment } from '../comments/comments.service';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateNewsDto {
   @IsString()
@@ -8,14 +7,6 @@ export class CreateNewsDto {
     message: 'Поле description должно быть строкой',
   })
   description: string;
-  @IsString()
-  author: string;
-  @IsOptional()
-  @IsString()
-  countView: number;
-  @IsOptional()
-  @IsArray()
-  comments?: Comment[];
   @IsOptional()
   @IsString()
   cover?: string;

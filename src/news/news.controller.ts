@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Render,
+  Req,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -19,8 +20,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { HelperFileLoader } from '../utils/HelperFileLoad';
 import { diskStorage } from 'multer';
 import { MailService } from '../mail/mail.service';
+import { NewsEntity } from './news.entity';
 
-function difference(newNews: News, oldNews: News) {
+function difference(newNews: NewsEntity, oldNews: NewsEntity) {
   const result = {};
   Object.keys(oldNews).map((key) => {
     if (oldNews[key] != newNews[key]) {
@@ -98,35 +100,6 @@ export class NewsController {
     };
   }
 
-  @Post('/api/edit')
-  @UseInterceptors(
-    FileInterceptor('cover', {
-      storage: diskStorage({
-        destination: HelperFileLoader.destinationPath,
-        filename: HelperFileLoader.customFileName,
-      }),
-    }),
-  )
-  @HttpCode(200)
-  async edit(
-    @Body() news: any,
-    @UploadedFile() cover: Express.Multer.File,
-    @Res() response,
-  ): Promise<News[]> {
-    const oldNews = this.newsService.find(news.id);
-    if (cover?.filename) {
-      news.cover = '/' + cover.filename;
-    }
-    const editedNews = this.newsService.edit(news);
-    const diff = difference(editedNews, oldNews);
-    await this.mailService.editedNewsForAdmin(
-      ['mag20102009@gmail.com'],
-      oldNews,
-      diff,
-    );
-    return response.redirect(`/news/${editedNews.id}`);
-  }
-
   @Post('/api/create')
   @UseInterceptors(
     FileInterceptor('cover', {
@@ -141,12 +114,11 @@ export class NewsController {
     @Body() news: CreateNewsDto,
     @UploadedFile() cover: Express.Multer.File,
     @Res() response,
-  ): Promise<News> {
+  ): Promise<NewsEntity> {
     if (cover?.filename) {
       news.cover = '/' + cover.filename;
     }
-    this.newsService.create(news);
-    const createdNews = this.newsService.create(news);
+    const createdNews = await this.newsService.create(news);
     await this.mailService.sendNewNewsForAdmins(
       ['mag20102009@gmail.com'],
       createdNews,
@@ -154,10 +126,42 @@ export class NewsController {
     return response.redirect(`/news`);
   }
 
+  @Post('/api/:id/edit')
+  @UseInterceptors(
+    FileInterceptor('cover', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+    }),
+  )
+  @HttpCode(200)
+  async edit(
+    @Body() news: NewsEntity,
+    @UploadedFile() cover: Express.Multer.File,
+    @Res() response,
+    @Param('id') id: string,
+  ): Promise<News[]> {
+    const oldNews = await this.newsService.find(parseInt(id));
+    if (oldNews) {
+      if (cover?.filename) {
+        news.cover = '/' + cover.filename;
+      }
+      const editedNews = this.newsService.edit(id, news);
+      const diff = difference(editedNews, oldNews);
+      await this.mailService.editedNewsForAdmin(
+        ['mag20102009@gmail.com'],
+        oldNews,
+        diff,
+      );
+    }
+    return response.redirect(`/news/${editedNews.id}`);
+  }
+
   @Delete('/api/:id')
   @HttpCode(200)
-  delete(@Param('id') idOrig: string): string {
-    const isRemoved = this.newsService.remove(parseInt(idOrig));
+  delete(@Param('id') id: string): string {
+    const isRemoved = this.newsService.remove(parseInt(id));
     return isRemoved ? 'Новость удалена' : 'Передан неверный id';
   }
 }

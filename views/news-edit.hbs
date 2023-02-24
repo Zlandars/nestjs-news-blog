@@ -1,5 +1,5 @@
 <h1>Редактирование новости #{{news.id}}</h1>
-<form method='post' action='/news/api/edit' enctype='multipart/form-data'>
+<form method='post' action='/news/api/{{news.id}}/edit' enctype='multipart/form-data'>
     <div class='mb-3'>
         <label for='id' class='form-label'>ID Новости, лучше бы его не менять...</label>
         <input name='id' value='{{news.id}}'/>

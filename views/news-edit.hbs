@@ -1,8 +1,8 @@
-<h1>Редактирование новости #{{news.id}}</h1>
-<form method='post' action='/news/api/{{news.id}}/edit' enctype='multipart/form-data'>
+<h1>Редактирование новости #{{this.id}}</h1>
+<form method='post' action='/news/api/{{this.id}}/edit' enctype='multipart/form-data'>
     <div class='mb-3'>
         <label for='id' class='form-label'>ID Новости, лучше бы его не менять...</label>
-        <input name='id' value='{{news.id}}'/>
+        <input name='id' id='id' value='{{this.id}}'/>
     </div>
     <div class='mb-3'>
         <label for='titleInput' class='form-label'>Заголовок</label>
@@ -10,7 +10,7 @@
                 class='form-control'
                 name='title'
                 id='titleInput'
-                value='{{news.title}}'
+                value='{{this.title}}'
         />
     </div>
     <div class='mb-3'>
@@ -20,16 +20,7 @@
                 name='description'
                 id='descriptionInput'
                 rows='3'
-        >{{news.description}}</textarea>
-    </div>
-    <div class='mb-3'>
-        <label for='authorInput' class='form-label'>Автор</label>
-        <input
-                class='form-control'
-                name='author'
-                id='authorInput'
-                value='{{news.author}}'
-        />
+        >{{this.description}}</textarea>
     </div>
     <div class='form-group'>
         <label for='cover'>Обложка новости</label>
@@ -38,7 +29,7 @@
                 class='form-control-file'
                 id='cover'
                 name='cover'
-                value='{{news.cover}}'
+                value='{{this.cover}}'
         />
     </div>
     <input type='submit' value='Сохранить изменения'/>

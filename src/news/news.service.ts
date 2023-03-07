@@ -1,76 +1,68 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Comment } from './comments/comments.service';
-import { getRandomInt } from '../utils/utils';
+import { NewsEntity } from './news.entity';
+import { CreateNewsDto } from './dto/create.news.dto';
+import { UsersService } from '../users/users.service';
 
 export type News = {
   id?: number;
   title: string;
   description: string;
   author: string;
-  countView: number;
-  comments?: Comment[];
+  countView?: number;
   cover?: string;
+  comments?: Comment[];
 };
 
 export type NewsEdit = Partial<News>;
 
 @Injectable()
 export class NewsService {
-  private readonly news: News[] = [
-    {
-      id: 1,
-      title: 'First',
-      description: 'First news description',
-      author: 'Eugen',
-      countView: 1,
-      comments: [],
-      cover:
-        'https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg',
-    },
-  ];
+  constructor(
+    @InjectRepository(NewsEntity)
+    private newsRepository: Repository<NewsEntity>,
+    private usersService: UsersService,
+  ) {}
 
-  create(news: News): News {
-    console.log(news);
-    // if (this.find(news.id) == undefined) {
-    const id = getRandomInt();
-    this.news.push({
-      ...news,
-      id: id,
-      countView: 1,
-      comments: [],
+  async create(news: CreateNewsDto): Promise<NewsEntity> {
+    const newsEntity = new NewsEntity();
+    newsEntity.title = news.title;
+    newsEntity.description = news.description;
+    newsEntity.cover = news.cover;
+    newsEntity.user = await this.usersService.findById(news.userId);
+    return this.newsRepository.save(newsEntity);
+  }
+
+  findById(id: News['id']): Promise<NewsEntity> {
+    return this.newsRepository.findOne({
+      where: { id },
+      relations: ['user', 'comments', 'comments.user'],
     });
-    console.log(this.news);
-    news.id = id;
-    return news;
-    // }
-    // return this.edit(news);
   }
 
-  find(id: number) {
-    return this.news.find((item) => item.id == id);
+  getAll(): Promise<NewsEntity[]> {
+    return this.newsRepository.find({ relations: ['user'] });
   }
 
-  remove(id: number) {
-    const indexRemove = this.news.findIndex((item) => item.id === id);
-    if (indexRemove !== -1) {
-      this.news.splice(indexRemove, 1);
-      return true;
+  async remove(id: number): Promise<NewsEntity | null> {
+    const removeNews = await this.findById(id);
+    console.log(removeNews);
+    if (removeNews) {
+      return this.newsRepository.remove(removeNews);
     }
-    return false;
+    return null;
   }
 
-  edit(news: NewsEdit): News {
-    const indexRemove = this.news.findIndex((item) => item.id == news.id);
-    if (indexRemove !== -1) {
-      this.news[indexRemove] = {
-        ...this.news[indexRemove],
-        ...news,
-      };
+  async edit(id: number, news: NewsEntity): Promise<NewsEntity | null> {
+    const editedNews = await this.findById(id);
+    if (editedNews) {
+      editedNews.title = news.title || editedNews.title;
+      editedNews.description = news.description || editedNews.description;
+      editedNews.cover = news.cover || editedNews.cover;
+      return await this.newsRepository.save(editedNews);
     }
-    return this.news[indexRemove];
-  }
-
-  allNews(): News[] {
-    return this.news;
+    return null;
   }
 }

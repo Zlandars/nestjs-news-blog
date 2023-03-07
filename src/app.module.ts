@@ -7,7 +7,8 @@ import { CalculatorService } from './calculator/calculator.service';
 import { CalculatorModule } from './calculator/calculator.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { MailModule } from './mail/mail.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -16,7 +17,17 @@ import { MailModule } from './mail/mail.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    MailModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: '890df23a',
+      database: 'nest-news-blog',
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
+    UsersModule,
   ],
   controllers: [AppController, CalculatorController],
   providers: [AppService, CalculatorService],

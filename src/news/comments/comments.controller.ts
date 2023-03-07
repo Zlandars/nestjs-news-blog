@@ -22,7 +22,7 @@ export class CommentsController {
     @Body() comment: CreateCommentDto,
   ) {
     // const jwtUserId = req.user.userId;
-    const jwtUserId = 1;
+    const jwtUserId = 2;
     return this.commentService.create(idNews, comment.message, jwtUserId);
   }
 

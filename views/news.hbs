@@ -30,6 +30,7 @@
                         <a href='#{{this.idAnswer}}'>{{this.idAnswer}}</a>{{/if}}
                     {{this.message}}
                     <br/>
+                    <div onclick="sendForm({{this.id}})">X</div>
                     <button
                             id='{{this.id}}'
                             onclick='replyComment(event)'
@@ -59,6 +60,21 @@
                         document.querySelector("#comments");
                 form.idAnswer.value = e.target.id;
                 console.log('id заменен на ' + form.idAnswer.value)
+            }
+
+            function sendForm(id) {
+                var data = new FormData($('form')[0]);
+                $.ajax({
+                    url: `/comments/api/details/${id}`,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'DELETE',
+                    success: function () {
+                        alert('Коммент удален')
+                        window.location.reload();
+                    }
+                });
             }
         </script>
     </div>

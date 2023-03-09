@@ -12,6 +12,7 @@ import {
   Render,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { News, NewsService } from './news.service';
@@ -22,6 +23,9 @@ import { HelperFileLoader } from '../utils/HelperFileLoad';
 import { diskStorage } from 'multer';
 import { MailService } from '../mail/mail.service';
 import { NewsEntity } from './news.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Role } from '../auth/role/role.enum';
+import { Roles } from '../auth/role/roles.decorator';
 
 // function difference(newNews: NewsEntity, oldNews: NewsEntity) {
 //   const result = {};
@@ -110,6 +114,8 @@ export class NewsController {
     return news;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin, Role.Moderator)
   @Post('/api/create')
   @UseInterceptors(
     FileInterceptor('cover', {

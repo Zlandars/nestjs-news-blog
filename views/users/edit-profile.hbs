@@ -1,0 +1,48 @@
+<h1>Редактирование профиля</h1>
+<h6>Привет, {{firstName}}!</h6>
+<form method="post" action="/">
+    <div class="mb-3">
+        <label for="firstName" class="form-label">Имя</label>
+        <input class="form-control" name="firstName" id="firstName" value="{{firstName}}">
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">email</label>
+        <input class="form-control" type="email" name="email" id="email" value="{{email}}">
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Новый пароль</label>
+        <input class="form-control" name="password" id="password">
+    </div>
+    <div class="mb-3">
+        <label for="roles" class="form-label">Роль</label>
+        <select name="roles" id="roles">
+            <option value="admin" selected>Администратор</option>
+            <option value="user">Пользователь</option>
+            <option value="moderator">Модератор</option>
+        </select>
+    </div>
+    <button type="button" class="btn btn-primary" onclick='sendForm()'>Редактировать</button>
+</form>
+<script>
+    function sendForm() {
+        var data = new FormData($('form')[0]);
+        $.ajax({
+            url: `/users/api/edit/{{id}}`,
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            },
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                firstName: $('#firstName')[0].value,
+                email: $('#email')[0].value,
+                password: $('#password')[0].value,
+                roles: $('#roles')[0].value
+            }),
+            success: function () {
+                alert('Профиль отредактирован')
+                window.location.reload();
+            }
+        });
+    }
+</script>

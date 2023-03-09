@@ -23,7 +23,7 @@ import { AuthModule } from './auth/auth.module';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1021',
+      password: '890df23a',
       database: 'nest-news-blog',
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,

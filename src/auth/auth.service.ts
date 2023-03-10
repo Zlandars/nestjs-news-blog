@@ -33,8 +33,7 @@ export class AuthService {
     return this.jwtService.verify(token);
   }
 
-  //
-  // async decode(token: string) {
-  //   return this.jwtService.decode(token);
-  // }
+  async decode(token: string) {
+    return this.jwtService.decode(token);
+  }
 }

@@ -88,7 +88,6 @@ export class NewsController {
         HttpStatus.NOT_FOUND,
       );
     }
-    console.log(news);
     return news;
   }
 
@@ -169,9 +168,9 @@ export class NewsController {
       );
     }
     // if (oldNews) {
-    // if (cover?.filename) {
-    //   news.cover = '/' + cover.filename;
-    // }
+    if (cover?.filename) {
+      news.cover = '/' + cover.filename;
+    }
     // const editedNews = await this.newsService.edit(id, news);
     // const diff = difference(editedNews, oldNews);
     // await this.mailService.editedNewsForAdmin(

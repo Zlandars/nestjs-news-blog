@@ -25,7 +25,6 @@
 </form>
 <script>
     function sendForm() {
-        var data = new FormData($('form')[0]);
         $.ajax({
             url: `/users/api/edit/{{id}}`,
             headers: {

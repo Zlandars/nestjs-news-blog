@@ -5,6 +5,7 @@ import { UsersEntity } from './users.entity';
 import { CreateUsersDto } from './dto/create.users.dto';
 import { hash } from '../utils/crypto';
 import { EditUsersDto } from './dto/edit.users.dto';
+import { checkPermission, Modules } from '../auth/role/utils/check-permission';
 
 @Injectable()
 export class UsersService {
@@ -26,7 +27,9 @@ export class UsersService {
     const _user = await this.findById(userId);
     _user.firstName = user.firstName || _user.firstName;
     _user.email = user.email || _user.email;
-    _user.roles = user.roles || _user.roles;
+    if (checkPermission(Modules.changeRole, _user.roles)) {
+      _user.roles = user.roles || _user.roles;
+    }
     _user.password = (await hash(user.password)) || _user.password;
     return this.usersRepository.save(_user);
   }

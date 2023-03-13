@@ -12,7 +12,6 @@ import { Server, Socket } from 'socket.io';
 import { WsJwtGuard } from '../../auth/ws-jwt.guard';
 import { CommentsService } from './comments.service';
 import { EventsComment } from './EventsComment.enum';
-import { use } from 'passport';
 
 export type Comment = { message: string; idNews: number };
 

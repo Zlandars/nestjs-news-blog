@@ -47,12 +47,10 @@ class Comments extends React.Component {
     this.socket.on('editComment', (payload) => {
       const { id, comment } = payload;
       const comments = [...this.state.comments];
-      console.log(comments);
       const indexEdit = comments.findIndex((c) => c.id === id);
       if (indexEdit !== -1) {
         comments[indexEdit].message = comment;
       }
-      console.log(comments);
       this.setState({ comments });
     });
   }
@@ -82,8 +80,30 @@ class Comments extends React.Component {
     });
   };
 
+  editViewComment = (id, message) => {
+    let area = document.querySelector(
+      `html.h-100 body.d-flex.flex-column.h-100 main.flex-shrink-0 div.container div.row div#app div div div.form-floating.mb-1 textarea.form-control`,
+    );
+    let btn = document.querySelector(`button[name="${id}"]`);
+
+    btn.innerText = 'Сохранить';
+    btn.onclick = () => {
+      console.log('emit');
+      this.socket.emit('editComment', {
+        commentId: id,
+        newsId: this.idNews,
+        comment: this.state.message,
+      });
+      // fetch(`/comments/api/${id}`, {
+      //   method: 'PUT',
+      //   body: JSON.stringify({ message: this.state.message }),
+      // }).then((data) => console.log(data));
+    };
+    area.value = message;
+  };
+
   removeComment = (idComment) => {
-    fetch(`http://localhost:3000/comments/api/details/${idComment}`, {
+    fetch(`http://localhost:3003/comments/api/details/${idComment}`, {
       method: 'DELETE',
     });
   };
@@ -98,7 +118,7 @@ class Comments extends React.Component {
             <div key={comment + index} className="card mb-1">
               <div className="card-body">
                 <strong>{comment.user.firstName}</strong>
-                <div>{comment.message}</div>
+                <div id={comment.id}>{comment.message}</div>
                 <div>
                   {comment.user.id === userId || role === 'admin' ? (
                     <button
@@ -106,6 +126,17 @@ class Comments extends React.Component {
                       onClick={() => this.removeComment(comment.id)}
                     >
                       Удалить
+                    </button>
+                  ) : null}
+                  {comment.user.id === userId || role === 'admin' ? (
+                    <button
+                      name={comment.id}
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() =>
+                        this.editViewComment(comment.id, comment.message)
+                      }
+                    >
+                      Редактировать
                     </button>
                   ) : null}
                 </div>

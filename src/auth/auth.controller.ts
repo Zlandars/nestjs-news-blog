@@ -8,7 +8,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req, @Res() response) {
+  async login(@Request() req, @Res({ passthrough: true }) response) {
     const { access_token, id, role } = await this.authService.login(req.user);
     response.cookie('jwt', access_token, { httpOnly: true });
     response.cookie('userId', id);

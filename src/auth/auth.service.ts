@@ -21,12 +21,11 @@ export class AuthService {
 
   async login(user: any) {
     const payload = { email: user.username, id: user.id };
-    const data = {
+    return {
       access_token: this.jwtService.sign(payload),
       id: user.id,
       role: user.roles,
     };
-    return data;
   }
 
   async verify(token: string) {

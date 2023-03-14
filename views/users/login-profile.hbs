@@ -17,22 +17,30 @@
         <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
     </div>
 </main>
-
 <script>
     function sendForm() {
-        var data = new FormData($('form')[0]);
-        $.ajax({
+        axios({
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
             },
-            data: JSON.stringify({username: $('#username')[0].value, password: $('#password')[0].value}),
+            data: {username: $('#username')[0].value, password: $('#password')[0].value},
             url: '/auth/login',
-            success: function (response) {
-                alert('Авторизован!')
-                localStorage.setItem('access_token', response.access_token)
-                window.location.href = '/news';
-            }
-        })
+        }).then((data) => {
+            console.log(data)
+        }).catch((err) => console.log(err))
+        // $.ajax({
+        //     method: 'POST',
+        //     headers: {
+        //         'content-type': 'application/json',
+        //     },
+        //     data: JSON.stringify({username: $('#username')[0].value, password: $('#password')[0].value}),
+        //     url: '/auth/login',
+        //     success: function (response) {
+        //         alert('Авторизован!')
+        //         localStorage.setItem('access_token', response.access_token)
+        //         window.location.href = '/news';
+        //     }
+        // })
     }
 </script>

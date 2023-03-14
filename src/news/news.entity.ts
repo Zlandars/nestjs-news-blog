@@ -36,7 +36,7 @@ export class NewsEntity {
 
   @ApiProperty({
     example:
-      'http://localhost:3000/news-static/bebbcfe4-e111-406b-8653-9840bfcb561c.PNG',
+      'http://localhost:3003/news-static/bebbcfe4-e111-406b-8653-9840bfcb561c.PNG или относительный путь',
     description: 'Обложка новости',
   })
   @Column('text', { nullable: true })

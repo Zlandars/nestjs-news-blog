@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Render,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUsersDto } from './dto/create.users.dto';
@@ -40,16 +41,18 @@ export class UsersController {
   @Render('users/edit-profile')
   async editView(
     @Param('userId', ParseIntPipe) userId: number,
+    @Req() req,
   ): Promise<UsersEntity> {
     return this.userService.findById(userId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles(Role.User)
+  @Roles(Role.Admin)
   @Patch('api/edit/:userId')
   async edit(
     @Param('userId', ParseIntPipe) userId,
     @Body() body: EditUsersDto,
+    @Req() req,
   ) {
     return this.userService.edit(userId, body);
   }

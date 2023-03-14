@@ -26,6 +26,7 @@ import { NewsEntity } from './news.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Role } from '../auth/role/role.enum';
 import { Roles } from '../auth/role/roles.decorator';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 // function difference(newNews: NewsEntity, oldNews: NewsEntity) {
 //   const result = {};
@@ -37,6 +38,7 @@ import { Roles } from '../auth/role/roles.decorator';
 //   return result;
 // }
 
+@ApiBearerAuth()
 @Controller('news')
 export class NewsController {
   constructor(
@@ -88,7 +90,6 @@ export class NewsController {
         HttpStatus.NOT_FOUND,
       );
     }
-    console.log(news);
     return news;
   }
 
@@ -114,6 +115,13 @@ export class NewsController {
     return news;
   }
 
+  @ApiOperation({ summary: 'Создание новости' })
+  @ApiResponse({
+    status: 200,
+    description: 'Новость успешно создалась',
+    type: NewsEntity,
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   @UseGuards(JwtAuthGuard)
   @Roles(Role.Admin, Role.Moderator)
   @Post('/api/create')
@@ -169,9 +177,9 @@ export class NewsController {
       );
     }
     // if (oldNews) {
-    // if (cover?.filename) {
-    //   news.cover = '/' + cover.filename;
-    // }
+    if (cover?.filename) {
+      news.cover = '/' + cover.filename;
+    }
     // const editedNews = await this.newsService.edit(id, news);
     // const diff = difference(editedNews, oldNews);
     // await this.mailService.editedNewsForAdmin(

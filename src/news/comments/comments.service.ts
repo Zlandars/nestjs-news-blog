@@ -4,6 +4,8 @@ import { CommentsEntity } from './comments.entity';
 import { Repository } from 'typeorm';
 import { NewsService } from '../news.service';
 import { UsersService } from '../../users/users.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventsComment } from './EventsComment.enum';
 
 export type Comment = {
   id?: number;
@@ -25,6 +27,7 @@ export class CommentsService {
     private readonly commentsRepository: Repository<CommentsEntity>,
     private readonly newsService: NewsService,
     private readonly userService: UsersService,
+    private readonly eventEmmiter: EventEmitter2,
   ) {}
 
   async create(
@@ -66,8 +69,23 @@ export class CommentsService {
       where: { id: idComment },
       relations: ['news', 'user'],
     });
+    if (!_comment) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'Комментарий не найден',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
     _comment.message = comment.message;
-    return await this.commentsRepository.save(_comment);
+    const commentary = await this.commentsRepository.save(_comment);
+    this.eventEmmiter.emit(EventsComment.edit, {
+      commentId: commentary.id,
+      newsId: commentary.news.id,
+      comment: commentary.message,
+    });
+    return commentary;
   }
 
   async find(idNews: number): Promise<CommentsEntity[]> {
@@ -91,6 +109,11 @@ export class CommentsService {
         HttpStatus.NOT_FOUND,
       );
     }
-    return await this.commentsRepository.remove(_comment);
+    const comment = await this.commentsRepository.remove(_comment);
+    this.eventEmmiter.emit('comment.remove', {
+      newsId: comment.news.id,
+      commentId: idComment,
+    });
+    return comment;
   }
 }

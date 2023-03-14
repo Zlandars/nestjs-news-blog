@@ -7,30 +7,31 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { EditCommentDto } from './dto/edit.comment.dto';
 import { CreateCommentDto } from './dto/create.comment.dto';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentService: CommentsService) {}
 
   @Post('/api/:idNews')
+  @UseGuards(JwtAuthGuard)
   create(
     @Param('idNews', ParseIntPipe) idNews: number,
     @Body() comment: CreateCommentDto,
+    @Req() req,
   ) {
-    // const jwtUserId = req.user.userId;
-    const jwtUserId = 2;
+    const jwtUserId = req.user.userId;
     return this.commentService.create(idNews, comment.message, jwtUserId);
   }
 
   @Put('/api/:idComment')
-  edit(
-    @Param('idComment', ParseIntPipe) idComment: number,
-    @Body() comment: EditCommentDto,
-  ) {
+  @UseGuards(JwtAuthGuard)
+  edit(@Param('idComment', ParseIntPipe) idComment: number, @Body() comment) {
     return this.commentService.edit(idComment, comment);
   }
 

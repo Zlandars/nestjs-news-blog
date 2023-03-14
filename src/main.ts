@@ -6,9 +6,11 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import * as expressHbs from 'express-handlebars';
 import * as hbs from 'hbs';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '.', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
@@ -31,10 +33,10 @@ async function bootstrap() {
   );
   // Swagger
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('API новостного блога')
+    .setDescription('Всем методы по взаимодействию с API')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('news, comments, users, calculator')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

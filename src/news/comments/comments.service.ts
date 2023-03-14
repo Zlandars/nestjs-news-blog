@@ -64,11 +64,7 @@ export class CommentsService {
     return this.commentsRepository.save(commentEntity);
   }
 
-  async edit(
-    idComment: number,
-    comment: CommentEdit,
-    userId: number,
-  ): Promise<CommentsEntity> {
+  async edit(idComment: number, comment: CommentEdit): Promise<CommentsEntity> {
     const _comment = await this.commentsRepository.findOne({
       where: { id: idComment },
       relations: ['news', 'user'],

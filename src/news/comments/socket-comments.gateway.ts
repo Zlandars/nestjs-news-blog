@@ -33,6 +33,15 @@ export class SocketCommentsGateway
     this.server.to(idNews.toString()).emit('newComment', _comment);
   }
 
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('editComment')
+  async handleMessageEdit(client: Socket, comment) {
+    console.log('emit');
+    const { commentId, message } = comment;
+    const _comment = await this.commentsService.edit(commentId, comment);
+    this.server.to(_comment.news.id.toString()).emit('editComment', _comment);
+  }
+
   @OnEvent(EventsComment.remove)
   handleRemoveCommentEvent(payload) {
     const { newsId, commentId } = payload;

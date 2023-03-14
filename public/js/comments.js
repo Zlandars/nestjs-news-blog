@@ -88,16 +88,18 @@ class Comments extends React.Component {
 
     btn.innerText = 'Сохранить';
     btn.onclick = () => {
-      console.log('emit');
-      this.socket.emit('editComment', {
-        commentId: id,
-        newsId: this.idNews,
-        comment: this.state.message,
-      });
-      // fetch(`/comments/api/${id}`, {
-      //   method: 'PUT',
-      //   body: JSON.stringify({ message: this.state.message }),
-      // }).then((data) => console.log(data));
+      axios({
+        method: 'PUT',
+        headers: {
+          'content-type': 'application/json',
+        },
+        data: { message: this.state.message },
+        url: `/comments/api/${id}`,
+      })
+        .then(() => {
+          btn.innerText = 'Редактировать';
+        })
+        .catch((err) => console.log(err));
     };
     area.value = message;
   };

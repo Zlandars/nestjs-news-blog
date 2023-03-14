@@ -11,7 +11,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { EditCommentDto } from './dto/edit.comment.dto';
 import { CreateCommentDto } from './dto/create.comment.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
@@ -32,13 +31,8 @@ export class CommentsController {
 
   @Put('/api/:idComment')
   @UseGuards(JwtAuthGuard)
-  edit(
-    @Param('idComment', ParseIntPipe) idComment: number,
-    @Body() comment: EditCommentDto,
-    @Req() req,
-  ) {
-    const jwtUserId = req.user.userId;
-    return this.commentService.edit(idComment, comment, jwtUserId);
+  edit(@Param('idComment', ParseIntPipe) idComment: number, @Body() comment) {
+    return this.commentService.edit(idComment, comment);
   }
 
   @Get('/api/details/:idNews')

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateNewsDto {
   @IsString()
@@ -10,6 +10,4 @@ export class CreateNewsDto {
   @IsOptional()
   @IsString()
   cover: string;
-  @IsNotEmpty()
-  userId: number;
 }

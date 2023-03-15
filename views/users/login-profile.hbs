@@ -26,8 +26,8 @@
             },
             data: {username: $('#username')[0].value, password: $('#password')[0].value},
             url: '/auth/login',
-        }).then((data) => {
-            console.log(data)
+        }).then(() => {
+            window.history.back();
         }).catch((err) => console.log(err))
         // $.ajax({
         //     method: 'POST',

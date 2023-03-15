@@ -13,10 +13,14 @@ import {
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create.comment.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { UsersService } from '../../users/users.service';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly commentService: CommentsService) {}
+  constructor(
+    private readonly commentService: CommentsService,
+    private readonly userService: UsersService,
+  ) {}
 
   @Post('/api/:idNews')
   @UseGuards(JwtAuthGuard)
@@ -41,7 +45,12 @@ export class CommentsController {
   }
 
   @Delete('/api/details/:idComment')
-  remove(@Param('idComment', ParseIntPipe) idComment: number) {
-    return this.commentService.remove(idComment);
+  @UseGuards(JwtAuthGuard)
+  async remove(
+    @Param('idComment', ParseIntPipe) idComment: number,
+    @Req() req,
+  ) {
+    const userId = req.user.id;
+    return this.commentService.remove(idComment, userId);
   }
 }

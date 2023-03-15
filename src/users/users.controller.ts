@@ -17,14 +17,10 @@ import { EditUsersDto } from './dto/edit.users.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Role } from '../auth/role/role.enum';
 import { Roles } from '../auth/role/roles.decorator';
-import { AuthService } from '../auth/auth.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly userService: UsersService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly userService: UsersService) {}
 
   @Post('api')
   async create(@Body() user: CreateUsersDto) {
@@ -52,7 +48,6 @@ export class UsersController {
   async edit(
     @Param('userId', ParseIntPipe) userId,
     @Body() body: EditUsersDto,
-    @Req() req,
   ) {
     return this.userService.edit(userId, body);
   }

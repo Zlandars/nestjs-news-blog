@@ -6,6 +6,10 @@ import { NewsService } from '../news.service';
 import { UsersService } from '../../users/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventsComment } from './EventsComment.enum';
+import {
+  checkPermission,
+  Modules,
+} from '../../auth/role/utils/check-permission';
 
 export type Comment = {
   id?: number;
@@ -95,7 +99,7 @@ export class CommentsService {
     });
   }
 
-  async remove(idComment: number): Promise<CommentsEntity> {
+  async remove(idComment: number, userId: number): Promise<CommentsEntity> {
     const _comment = await this.commentsRepository.findOne({
       where: { id: idComment },
       relations: ['news', 'user'],
@@ -105,6 +109,19 @@ export class CommentsService {
         {
           status: HttpStatus.NOT_FOUND,
           error: 'Комментарий не найден',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const _user = await this.userService.findById(userId);
+    if (
+      _user.id !== _comment.user.id &&
+      !checkPermission(Modules.editComment, _user.roles)
+    ) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'Недостаточно прав',
         },
         HttpStatus.NOT_FOUND,
       );

@@ -7,9 +7,13 @@ import { join } from 'path';
 import * as expressHbs from 'express-handlebars';
 import * as hbs from 'hbs';
 import * as cookieParser from 'cookie-parser';
+import * as process from 'process';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+  });
+  app.enableCors();
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '.', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
@@ -41,7 +45,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3003);
+  await app.listen(parseInt(process.env.PORT));
 }
 
 bootstrap();

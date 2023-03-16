@@ -17,7 +17,7 @@ class Comments extends React.Component {
     };
     this.idNews = parseInt(window.location.href.split('/').reverse()[0]);
     const bearerToken = Cookies.get('authorization');
-    this.socket = io('http://localhost:3003', {
+    this.socket = io(`localhost:3003`, {
       query: {
         newsId: this.idNews,
       },

@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Post,
   Render,
+  Req,
   Res,
   UploadedFile,
   UseGuards,
@@ -27,16 +28,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Role } from '../auth/role/role.enum';
 import { Roles } from '../auth/role/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-
-// function difference(newNews: NewsEntity, oldNews: NewsEntity) {
-//   const result = {};
-//   Object.keys(oldNews).map((key) => {
-//     if (oldNews[key] != newNews[key]) {
-//       result[key] = newNews[key];
-//     }
-//   });
-//   return result;
-// }
+import { UsersService } from '../users/users.service';
 
 @ApiBearerAuth()
 @Controller('news')
@@ -45,6 +37,7 @@ export class NewsController {
     private readonly newsService: NewsService,
     private readonly commentService: CommentsService,
     private readonly mailService: MailService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Get('/')
@@ -53,6 +46,14 @@ export class NewsController {
   async allNewsView() {
     const news = await this.newsService.getAll();
     return { news: news, title: 'Список новостей' };
+  }
+
+  @Get('create')
+  @Render('create-news')
+  async createView(@Req() req) {
+    const userData = await this.usersService.findById(req.cookies.userId);
+    console.log(userData);
+    return { userInfo: userData };
   }
 
   @Get('/:id')
@@ -95,7 +96,7 @@ export class NewsController {
 
   @Get('/api/all')
   @HttpCode(200)
-  createNewsView(): Promise<NewsEntity[]> {
+  newsView(): Promise<NewsEntity[]> {
     return this.newsService.getAll();
   }
 
@@ -138,11 +139,13 @@ export class NewsController {
     @Body() news: CreateNewsDto,
     @UploadedFile() cover: Express.Multer.File,
     @Res() response,
+    @Req() req,
   ): Promise<NewsEntity> {
+    const userData = await this.usersService.findById(req.cookies.userId);
     if (cover?.filename) {
       news.cover = '/' + cover.filename;
     }
-    const createdNews = await this.newsService.create(news);
+    const createdNews = await this.newsService.create(news, userData.id);
     await this.mailService.sendNewNewsForAdmins(
       ['mag20102009@gmail.com'],
       createdNews,

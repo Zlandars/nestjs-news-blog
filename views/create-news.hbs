@@ -15,7 +15,8 @@
     </div>
     <div class='mb-3'>
         <label for='authorInput' class='form-label'>Автор</label>
-        <input class='form-control' name='author' id='authorInput'/>
+        <input class='form-control' name='author' id='authorInput' value="{{userInfo.firstName}} - {{userInfo.roles}}"
+               disabled/>
     </div>
     <div class='form-group'>
         <label for='cover'>Обложка новости</label>

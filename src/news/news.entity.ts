@@ -10,6 +10,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { UsersEntity } from '../users/users.entity';
 import { CommentsEntity } from './comments/comments.entity';
+import * as process from 'process';
 
 @Entity('news')
 export class NewsEntity {
@@ -35,8 +36,7 @@ export class NewsEntity {
   description: string;
 
   @ApiProperty({
-    example:
-      'http://localhost:3003/news-static/bebbcfe4-e111-406b-8653-9840bfcb561c.PNG или относительный путь',
+    example: `http://${process.env.HOST}:${process.env.PORT}/news-static/bebbcfe4-e111-406b-8653-9840bfcb561c.PNG или относительный путь`,
     description: 'Обложка новости',
   })
   @Column('text', { nullable: true })

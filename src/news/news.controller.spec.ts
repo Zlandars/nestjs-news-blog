@@ -1,18 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NewsController } from './news.controller';
+import { NewsService } from './news.service';
 
 describe('NewsController', () => {
-  let controller: NewsController;
+  let newsController: NewsController;
+  let newsService: NewsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NewsController],
+      providers: [NewsService],
     }).compile();
 
-    controller = module.get<NewsController>(NewsController);
+    newsController = module.get<NewsController>(NewsController);
+    newsService = module.get<NewsService>(NewsService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('getAllNews', () => {
+    it('Should return array News["users", "comments"]', async () => {
+      const result = [];
+      jest.spyOn(newsService, 'getAll').mockImplementation(() => result);
+      expect(await newsService.getAll()).toBe(result);
+    });
   });
 });
